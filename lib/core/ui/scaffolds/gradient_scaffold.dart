@@ -23,19 +23,19 @@ class GradientScaffold extends StatelessWidget {
         height: double.infinity,
 
         decoration: BoxDecoration(
-          gradient: LinearGradient(
+          gradient:LinearGradient(
             colors: isDark
                 ? [
-              Color.lerp(primary, surface, 0.85)!,
               surface,
+              Color.lerp(primary, surface, 0.93)!,
             ]
                 : [
-              Color.lerp(primary, surface, 0.92)!,
               surface,
+              Color.lerp(primary, surface, 0.8)!,
             ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          )
         ),
 
         child: child,

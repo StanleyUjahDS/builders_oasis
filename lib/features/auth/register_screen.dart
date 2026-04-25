@@ -4,33 +4,57 @@ import '/core/ui/scaffolds/gradient_scaffold.dart';
 import '/core/theme/app_colors.dart';
 
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class RegisterScreen extends StatefulWidget {
+  const RegisterScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _RegisterScreenState extends State<RegisterScreen> {
+  final _firstNameController = TextEditingController();
+  final _lastNameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _confirmController = TextEditingController();
 
   bool _loading = false;
+
   bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
 
   @override
   void dispose() {
+    _firstNameController.dispose();
+    _lastNameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
+    _confirmController.dispose();
     super.dispose();
   }
 
-  Future<void> _login() async {
+  Future<void> _register() async {
+    final firstName = _firstNameController.text.trim();
+    final lastName = _lastNameController.text.trim();
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
+    final confirm = _confirmController.text.trim();
 
-    if (email.isEmpty || password.isEmpty) {
-      _showError("Please enter email and password");
+    if (firstName.isEmpty ||
+        lastName.isEmpty ||
+        email.isEmpty ||
+        password.isEmpty) {
+      _showError("All fields are required");
+      return;
+    }
+
+    if (!email.contains('@') || !email.contains('.')) {
+      _showError("Enter a valid email address");
+      return;
+    }
+
+    if (password != confirm) {
+      _showError("Passwords do not match");
       return;
     }
 
@@ -41,10 +65,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (!mounted) return;
 
-      context.go('/home');
+      context.push('/register/interests');
     } catch (e) {
       if (!mounted) return;
-      _showError("Login failed");
+      _showError("Registration failed");
     }
 
     if (mounted) {
@@ -58,28 +82,56 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  void _googleLogin() {
-    // TODO: Google Sign-In
+  void _googleSignIn() {
+    // TODO: Implement Google Sign-In
   }
 
   @override
   Widget build(BuildContext context) {
     return GradientScaffold(
       child: Scaffold(
-        appBar: AppBar(title: const Text("Login")),
-
+        appBar: AppBar(title: const Text("Create Account")),
         body: SafeArea(
           child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Column(
               children: [
+
                 const Align(
                   alignment: Alignment.topLeft,
                   child: Text(
                     'Fill your details to get started or continue with Google',
                   ),
                 ),
+
                 const SizedBox(height: 12),
+
+                /// FIRST + LAST NAME
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _firstNameController,
+                        decoration: const InputDecoration(
+                          labelText: "First Name",
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: TextField(
+                        controller: _lastNameController,
+                        decoration: const InputDecoration(
+                          labelText: "Last Name",
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 16),
 
                 /// EMAIL
                 TextField(
@@ -118,27 +170,42 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
 
-                const SizedBox(height: 6),
+                const SizedBox(height: 16),
 
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: TextButton(
-                    onPressed: () {},
-                    child: const Text("Forgot Password?"),
+                /// CONFIRM PASSWORD
+                TextField(
+                  controller: _confirmController,
+                  obscureText: _obscureConfirmPassword,
+                  decoration: InputDecoration(
+                    labelText: "Confirm Password",
+                    border: const OutlineInputBorder(),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _obscureConfirmPassword
+                            ? Icons.visibility_off
+                            : Icons.visibility,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _obscureConfirmPassword =
+                          !_obscureConfirmPassword;
+                        });
+                      },
+                    ),
                   ),
                 ),
 
-                const SizedBox(height: 6),
+                const SizedBox(height: 20),
 
-                /// LOGIN BUTTON
+                /// CREATE ACCOUNT BUTTON
                 SizedBox(
                   width: double.infinity,
                   height: 50,
                   child: ElevatedButton(
-                    onPressed: _loading ? null : _login,
+                    onPressed: _loading ? null : _register,
                     child: _loading
                         ? const CircularProgressIndicator()
-                        : const Text("Login"),
+                        : const Text("Create Account"),
                   ),
                 ),
 
@@ -158,34 +225,33 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 const SizedBox(height: 20),
 
-                /// GOOGLE BUTTON (MATCH REGISTER STYLE)
                 SizedBox(
                   width: double.infinity,
                   height: 50,
                   child: OutlinedButton.icon(
-                    onPressed: _googleLogin,
+                    onPressed: _googleSignIn,
                     icon: const Icon(Icons.g_mobiledata, size: 28),
                     label: const Text("Continue with Google"),
                     style: OutlinedButton.styleFrom(
                       side: const BorderSide(
-                        color: AppColors.red200,
+                        color: AppColors.red200
+                        ,
                         width: 1.5,
                       ),
                     ),
                   ),
                 ),
-
                 const SizedBox(height: 30),
 
-                /// SIGN UP LINK
+                /// LOGIN LINK
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text("Don’t have an account? "),
+                    const Text("Already have an account? "),
                     GestureDetector(
-                      onTap: () => context.go('/register'),
+                      onTap: () => context.go('/login'),
                       child: const Text(
-                        "Sign up",
+                        "Login",
                         style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.red500),
                       ),
                     )

@@ -10,7 +10,6 @@ class WelcomePage1 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
 
     return GradientScaffold(
       child: Scaffold(
@@ -26,10 +25,9 @@ class WelcomePage1 extends StatelessWidget {
 
           actions: [
             TextButton(
-              onPressed: () => context.go('/home'),
+              onPressed: () => context.go('/register'),
               child: Text(
                 "Skip",
-                style: TextStyle(color: colorScheme.onSurface),
               ),
             ),
           ],

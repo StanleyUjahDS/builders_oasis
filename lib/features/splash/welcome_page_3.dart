@@ -10,7 +10,6 @@ class WelcomePage3 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
 
     return GradientScaffold(
       child: Scaffold(
@@ -26,10 +25,9 @@ class WelcomePage3 extends StatelessWidget {
 
           actions: [
             TextButton(
-              onPressed: () => context.go('/home'),
+              onPressed: () => context.go('/register'),
               child: Text(
                 "Skip",
-                style: TextStyle(color: colorScheme.onSurface),
               ),
             ),
           ],
@@ -59,13 +57,8 @@ class WelcomePage3 extends StatelessWidget {
                   color: Colors.red,
                   borderRadius: BorderRadius.circular(30),
                 ),
-                child: IconButton(
-                  onPressed: () => context.go('/home'),
-                  icon: const Icon(
-                    Icons.check,
-                    color: Colors.white,
-                  ),
-                ),
+                child:TextButton(onPressed:()=> context.go('/register'), child:
+               Text("Get Started", style: TextStyle( color: Colors.white)))
               ),
             ],
           ),

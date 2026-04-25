@@ -99,7 +99,7 @@ class AppTheme {
         backgroundColor: AppColors.red500,
         foregroundColor: Colors.white,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(30),
         ),
       ),
     ),
@@ -139,7 +139,7 @@ class AppTheme {
         backgroundColor: AppColors.red500,
         foregroundColor: Colors.white,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(30),
         ),
       ),
     ),
