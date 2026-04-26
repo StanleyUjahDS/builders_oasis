@@ -12,6 +12,12 @@ class InterestPickerScreen extends StatefulWidget {
 
 class _InterestPickerScreenState extends State<InterestPickerScreen> {
   final List<String> _interests = [
+
+    "Business & Entrepreneurship",
+    "Finance & Investing",
+    "Crypto & Blockchain",
+    "Programming Basics",
+    "Digital Marketing",
     "Frontend Development",
     "Backend Development",
     "Full Stack Development",
@@ -19,11 +25,6 @@ class _InterestPickerScreenState extends State<InterestPickerScreen> {
     "UI/UX Design",
     "Artificial Intelligence",
     "Data Science",
-    "Business & Entrepreneurship",
-    "Finance & Investing",
-    "Crypto & Blockchain",
-    "Programming Basics",
-    "Digital Marketing",
   ];
 
   final Set<String> _selected = {};
@@ -70,9 +71,9 @@ class _InterestPickerScreenState extends State<InterestPickerScreen> {
               /// HEADER TEXT
 
 
-              const SizedBox(height: 30),
+              const SizedBox(height: 100),
 
-              /// 🔥 BOTTOM PANEL
+              ///  BOTTOM PANEL
               Expanded(
                 child: Container(
                   decoration: BoxDecoration(

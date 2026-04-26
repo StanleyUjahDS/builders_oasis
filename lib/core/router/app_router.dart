@@ -11,13 +11,13 @@ import '../../features/auth/register_screen.dart';
 
 import '/features/initials/interest_picker.dart';
 import '/features/initials/avatar_picker.dart';
+import '/core/router/main_navigation.dart';
 
 class AppRouter {
   static final GoRouter router = GoRouter(
     initialLocation: '/splash',
     routes: [
 
-      /// SPLASH + WELCOME
       GoRoute(
         path: '/splash',
         builder: (context, state) => const SplashScreen(),
@@ -30,9 +30,10 @@ class AppRouter {
         path: '/welcome_two',
         builder: (context, state) => const WelcomePage2(),
       ),
+
       GoRoute(
-        path: '/welcome_three',
-        builder: (context, state) => const WelcomePage3(),
+        path: '/',
+        builder: (context, state) => const MainNavigation(),
       ),
 
       /// AUTH
