@@ -74,7 +74,7 @@ class _AvatarPickerScreenState extends State<AvatarPickerScreen> {
     }
   }
 
-  /// 📂 BOTTOM SHEET
+  ///  BOTTOM SHEET
   void _showPickerOptions() {
     showModalBottomSheet(
       context: context,

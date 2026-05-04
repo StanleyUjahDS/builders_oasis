@@ -5,66 +5,43 @@ class ThemeController extends ChangeNotifier {
   static const String _key = "theme_mode";
 
   ThemeMode _themeMode = ThemeMode.system;
-
   ThemeMode get themeMode => _themeMode;
 
-  bool get isDark => _themeMode == ThemeMode.dark;
+  bool _initialized = false;
+  bool get initialized => _initialized;
 
-  ThemeController() {
-    _loadTheme(); // 🔥 load saved theme on startup
-  }
-
-  // 🔁 LOAD SAVED THEME
-  Future<void> _loadTheme() async {
+  // ================= INIT =================
+  Future<void> init() async {
     final prefs = await SharedPreferences.getInstance();
     final themeString = prefs.getString(_key);
 
-    switch (themeString) {
-      case "light":
-        _themeMode = ThemeMode.light;
-        break;
-      case "dark":
-        _themeMode = ThemeMode.dark;
-        break;
-      default:
-        _themeMode = ThemeMode.system;
+    if (themeString == "light") {
+      _themeMode = ThemeMode.light;
+    } else if (themeString == "dark") {
+      _themeMode = ThemeMode.dark;
+    } else {
+      _themeMode = ThemeMode.system;
     }
 
+    _initialized = true;
     notifyListeners();
   }
 
-  // 💾 SAVE THEME
-  Future<void> _saveTheme(ThemeMode mode) async {
+  // ================= SET THEME =================
+  Future<void> setTheme(ThemeMode mode) async {
+    _themeMode = mode;
+
     final prefs = await SharedPreferences.getInstance();
 
-    String value;
-    switch (mode) {
-      case ThemeMode.light:
-        value = "light";
-        break;
-      case ThemeMode.dark:
-        value = "dark";
-        break;
-      default:
-        value = "system";
-    }
+    await prefs.setString(
+      _key,
+      switch (mode) {
+        ThemeMode.light => "light",
+        ThemeMode.dark => "dark",
+        ThemeMode.system => "system",
+      },
+    );
 
-    await prefs.setString(_key, value);
-  }
-
-  // 🎨 SET THEME
-  void setTheme(ThemeMode mode) {
-    _themeMode = mode;
-    _saveTheme(mode); // 🔥 persist it
     notifyListeners();
-  }
-
-  // 🔄 TOGGLE
-  void toggleTheme() {
-    if (_themeMode == ThemeMode.dark) {
-      setTheme(ThemeMode.light);
-    } else {
-      setTheme(ThemeMode.dark);
-    }
   }
 }

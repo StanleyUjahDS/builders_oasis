@@ -23,7 +23,7 @@ class GradientScaffold extends StatelessWidget {
         height: double.infinity,
 
         decoration: BoxDecoration(
-          gradient:LinearGradient(
+          gradient: LinearGradient(
             colors: isDark
                 ? [
               surface,
@@ -35,7 +35,7 @@ class GradientScaffold extends StatelessWidget {
             ],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-          )
+          ),
         ),
 
         child: child,

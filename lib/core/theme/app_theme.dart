@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
 import 'app_colors.dart';
 import 'app_theme_extension.dart';
 
 class AppTheme {
-  //  TEXT THEME (shared across app)
+  // TEXT THEME
   static TextTheme _textTheme(Color textColor) {
     return TextTheme(
       displayLarge: TextStyle(
@@ -65,7 +67,7 @@ class AppTheme {
     );
   }
 
-  //  DARK THEME
+  // DARK THEME
   static ThemeData darkTheme = ThemeData(
     brightness: Brightness.dark,
 
@@ -89,7 +91,20 @@ class AppTheme {
     appBarTheme: const AppBarTheme(
       backgroundColor: Colors.transparent,
       foregroundColor: Colors.white,
+
       elevation: 0,
+      scrolledUnderElevation: 0,
+
+      surfaceTintColor: Colors.transparent,
+
+      systemOverlayStyle: SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.light,
+        statusBarBrightness: Brightness.dark,
+
+        systemNavigationBarColor: AppColors.darkBackground,
+        systemNavigationBarIconBrightness: Brightness.light,
+      ),
     ),
 
     cardColor: AppColors.darkSurface,
@@ -105,7 +120,7 @@ class AppTheme {
     ),
   );
 
-  //  LIGHT THEME
+  // LIGHT THEME
   static ThemeData lightTheme = ThemeData(
     brightness: Brightness.light,
 
@@ -129,7 +144,20 @@ class AppTheme {
     appBarTheme: const AppBarTheme(
       backgroundColor: Colors.transparent,
       foregroundColor: Colors.black,
+
       elevation: 0,
+      scrolledUnderElevation: 0,
+
+      surfaceTintColor: Colors.transparent,
+
+      systemOverlayStyle: SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.dark,
+        statusBarBrightness: Brightness.light,
+
+        systemNavigationBarColor: Colors.white,
+        systemNavigationBarIconBrightness: Brightness.dark,
+      ),
     ),
 
     cardColor: Colors.white,
