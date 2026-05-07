@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '/core/ui/scaffolds/gradient_scaffold.dart';
 import '/core/theme/app_colors.dart';
+import '/features/auth/services/auth_service.dart';
+import '/features/auth/services/storage_service.dart';
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 
 
 class RegisterScreen extends StatefulWidget {
@@ -12,6 +15,7 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
+
   final _firstNameController = TextEditingController();
   final _lastNameController = TextEditingController();
   final _emailController = TextEditingController();
@@ -19,7 +23,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _confirmController = TextEditingController();
 
   bool _loading = false;
-
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
 
@@ -33,7 +36,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
     super.dispose();
   }
 
+  // ✅ REGISTER FUNCTION (ONLY ONE VERSION)
   Future<void> _register() async {
+
     final firstName = _firstNameController.text.trim();
     final lastName = _lastNameController.text.trim();
     final email = _emailController.text.trim();
@@ -61,29 +66,79 @@ class _RegisterScreenState extends State<RegisterScreen> {
     setState(() => _loading = true);
 
     try {
-      await Future.delayed(const Duration(seconds: 1));
 
-      if (!mounted) return;
+      final response = await AuthService.register(
+        firstName: firstName,
+        lastName: lastName,
+        email: email,
+        password: password,
+      );
 
-      context.push('/register/interests');
+      if (response['success'] == true) {
+
+        final data = response['data'];
+
+        await StorageService.saveToken(data['token']);
+        await StorageService.saveUser(data['user']);
+
+        if (!mounted) return;
+
+        _showSuccess("Account created successfully");
+
+        context.go('/register/interests');
+
+      } else {
+        _showError(response['message'] ?? "Registration failed");
+      }
+
     } catch (e) {
-      if (!mounted) return;
-      _showError("Registration failed");
-    }
-
-    if (mounted) {
-      setState(() => _loading = false);
+      _showError("Something went wrong");
+    } finally {
+      if (mounted) {
+        setState(() => _loading = false);
+      }
     }
   }
 
+  /// ❌ ERROR SNACKBAR
   void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
+    final snackBar = SnackBar(
+      elevation: 0,
+      behavior: SnackBarBehavior.floating,
+      backgroundColor: Colors.transparent,
+      content: AwesomeSnackbarContent(
+        title: 'Error',
+        message: message,
+        contentType: ContentType.failure,
+      ),
     );
+
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(snackBar);
   }
 
+  /// ✅ SUCCESS SNACKBAR
+  void _showSuccess(String message) {
+    final snackBar = SnackBar(
+      elevation: 0,
+      behavior: SnackBarBehavior.floating,
+      backgroundColor: Colors.transparent,
+      content: AwesomeSnackbarContent(
+        title: 'Success',
+        message: message,
+        contentType: ContentType.success,
+      ),
+    );
+
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(snackBar);
+  }
+
+  ///  GOOGLE SIGN IN
   void _googleSignIn() {
-    // TODO: Implement Google Sign-In
+    _showError("Google Sign-In not implemented yet");
   }
 
   @override

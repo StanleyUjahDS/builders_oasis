@@ -3,6 +3,9 @@ import 'package:go_router/go_router.dart';
 import '/core/ui/scaffolds/gradient_scaffold.dart';
 import '/core/theme/app_colors.dart';
 
+import '/features/auth/services/auth_service.dart';
+import '/features/auth/services/storage_service.dart';
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -24,8 +27,8 @@ class _LoginScreenState extends State<LoginScreen> {
     _passwordController.dispose();
     super.dispose();
   }
-
   Future<void> _login() async {
+
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
 
@@ -37,31 +40,78 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() => _loading = true);
 
     try {
-      await Future.delayed(const Duration(seconds: 1));
 
-      if (!mounted) return;
+      final response = await AuthService.login(
+        email: email,
+        password: password,
+      );
 
-      context.go('/');
+      if (response['success']) {
+
+        final data = response['data'];
+
+        await StorageService.saveToken(data['token']);
+        await StorageService.saveUser(data['user']);
+
+        if (!mounted) return;
+
+        _showSuccess("Login successful");
+
+        context.go('/');
+
+      } else {
+        _showError(response['message']);
+      }
+
     } catch (e) {
-      if (!mounted) return;
-      _showError("Login failed");
-    }
-
-    if (mounted) {
-      setState(() => _loading = false);
+      _showError("Login failed. Try again.");
+    } finally {
+      if (mounted) {
+        setState(() => _loading = false);
+      }
     }
   }
 
+  /// ❌ ERROR SNACKBAR
   void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
+    final snackBar = SnackBar(
+      elevation: 0,
+      behavior: SnackBarBehavior.floating,
+      backgroundColor: Colors.transparent,
+      content: AwesomeSnackbarContent(
+        title: 'Error',
+        message: message,
+        contentType: ContentType.failure,
+      ),
     );
+
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(snackBar);
   }
 
+  /// ✅ SUCCESS SNACKBAR
+  void _showSuccess(String message) {
+    final snackBar = SnackBar(
+      elevation: 0,
+      behavior: SnackBarBehavior.floating,
+      backgroundColor: Colors.transparent,
+      content: AwesomeSnackbarContent(
+        title: 'Success',
+        message: message,
+        contentType: ContentType.success,
+      ),
+    );
+
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(snackBar);
+  }
+
+  /// 🔵 GOOGLE LOGIN
   void _googleLogin() {
-    // TODO: Google Sign-In
+    _showError("Google Sign-In not implemented yet");
   }
-
   @override
   Widget build(BuildContext context) {
     return GradientScaffold(

@@ -6,7 +6,7 @@ import '/core/ui/scaffolds/gradient_scaffold.dart';
 import '/core/theme/app_colors.dart';
 
 import '/features/reminder/reminder_service/reminder.dart';
-import '/features/reminder/reminder_service/reminder_controller.dart';
+import '/features/reminder/reminder_service/notifier_service.dart';
 
 class ReminderScreen extends StatefulWidget {
   const ReminderScreen({super.key});
@@ -18,8 +18,6 @@ class ReminderScreen extends StatefulWidget {
 class _ReminderScreenState extends State<ReminderScreen> {
   int selectedWeek = 1;
   DateTime selectedDate = DateTime.now();
-
-  final ReminderController controller = ReminderController();
 
   final List<String> weekOptions = [
     "Last Week",
@@ -50,11 +48,8 @@ class _ReminderScreenState extends State<ReminderScreen> {
         ? 12
         : dateTime.hour;
 
-    final minute =
-    dateTime.minute.toString().padLeft(2, '0');
-
-    final period =
-    dateTime.hour >= 12 ? "PM" : "AM";
+    final minute = dateTime.minute.toString().padLeft(2, '0');
+    final period = dateTime.hour >= 12 ? "PM" : "AM";
 
     return "$hour:$minute $period";
   }
@@ -77,7 +72,7 @@ class _ReminderScreenState extends State<ReminderScreen> {
   @override
   Widget build(BuildContext context) {
     final box = Hive.box<Reminder>('reminders');
-   final  theme = Theme.of(context);
+    final theme = Theme.of(context);
 
     return GradientScaffold(
       child: Scaffold(
@@ -92,78 +87,42 @@ class _ReminderScreenState extends State<ReminderScreen> {
 
         body: ValueListenableBuilder(
           valueListenable: box.listenable(),
-
           builder: (context, Box<Reminder> box, _) {
             final allReminders = box.values.toList();
-
-            final dayReminders =
-            filterByDate(allReminders);
+            final dayReminders = filterByDate(allReminders);
 
             final upcoming = dayReminders
-                .where(
-                  (r) => r.dateTime.isAfter(
-                DateTime.now(),
-              ),
-            )
+                .where((r) => r.dateTime.isAfter(DateTime.now()))
                 .toList();
 
             return Padding(
               padding: const EdgeInsets.all(20),
-
               child: Column(
-                crossAxisAlignment:
-                CrossAxisAlignment.start,
-
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
 
-                  // =========================
-                  // WEEK SELECTOR
-                  // =========================
-
+                  // ================= WEEK SELECTOR =================
                   Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                    ),
-
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
                     decoration: BoxDecoration(
                       color: theme.cardColor,
-                      borderRadius:
-                      BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(12),
                     ),
-
                     child: DropdownButtonHideUnderline(
                       child: DropdownButton<int>(
                         value: selectedWeek,
-                        elevation: 10,
-                        dropdownColor:
-                        theme.cardColor,
-
-                        iconEnabledColor:
-                       theme.primaryColor,
-
-                        items: List.generate(
-                          weekOptions.length,
-                              (i) {
-                            return DropdownMenuItem(
-                              value: i,
-
-                              child: Text(
-                                weekOptions[i],
-
-                                style:
-                                const TextStyle(
-
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-
+                        dropdownColor: theme.cardColor,
+                        iconEnabledColor: Colors.red,
+                        items: List.generate(weekOptions.length, (i) {
+                          return DropdownMenuItem(
+                            value: i,
+                            child: Text(weekOptions[i]),
+                          );
+                        }),
                         onChanged: (v) {
                           setState(() {
                             selectedWeek = v!;
-                            selectedDate =
-                                DateTime.now();
+                            selectedDate = DateTime.now();
                           });
                         },
                       ),
@@ -172,98 +131,42 @@ class _ReminderScreenState extends State<ReminderScreen> {
 
                   const SizedBox(height: 15),
 
-                  // =========================
-                  // UPCOMING REMINDERS
-                  // =========================
-
+                  // ================= UPCOMING =================
                   SizedBox(
                     height: 150,
-
                     child: upcoming.isEmpty
-                        ? Center(
-                      child: Text(
-                        "No upcoming reminders",
-
-                      ),
-                    )
+                        ? const Center(child: Text("No upcoming reminders"))
                         : ListView.builder(
-                      scrollDirection:
-                      Axis.horizontal,
-
-                      itemCount:
-                      upcoming.length,
-
-                      itemBuilder:
-                          (context, index) {
-                        final item =
-                        upcoming[index];
+                      scrollDirection: Axis.horizontal,
+                      itemCount: upcoming.length,
+                      itemBuilder: (context, index) {
+                        final item = upcoming[index];
 
                         return Container(
                           width: 200,
-
-                          margin:
-                          const EdgeInsets.only(
-                            right: 12,
+                          margin: const EdgeInsets.only(right: 12),
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: theme.cardColor,
+                            borderRadius: BorderRadius.circular(16),
+                            border: customBorder(),
                           ),
-
-                          padding:
-                          const EdgeInsets.all(
-                            16,
-                          ),
-
-                          decoration:
-                          BoxDecoration(
-                            color:theme.cardColor,
-
-                            borderRadius:
-                            BorderRadius
-                                .circular(
-                              16,
-                            ),
-
-                            border:
-                            customBorder(),
-                          ),
-
                           child: Column(
-                            crossAxisAlignment:
-                            CrossAxisAlignment
-                                .start,
-
-                            mainAxisAlignment:
-                            MainAxisAlignment
-                                .spaceBetween,
-
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-
                               Text(
                                 item.title,
-
-                                style:
-                                const TextStyle(
-
-                                  fontWeight:
-                                  FontWeight
-                                      .bold,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
-
-                              Text(
-                                formatTime(
-                                  item.dateTime,
-                                ),
-
-                              ),
-
+                              Text(formatTime(item.dateTime)),
                               const Align(
-                                alignment:
-                                Alignment
-                                    .bottomRight,
-
+                                alignment: Alignment.bottomRight,
                                 child: Icon(
                                   Icons.alarm,
-                                  color: AppColors
-                                      .red500,
+                                  color: AppColors.red500,
                                 ),
                               ),
                             ],
@@ -275,124 +178,67 @@ class _ReminderScreenState extends State<ReminderScreen> {
 
                   const SizedBox(height: 15),
 
-                  // =========================
-                  // DATE NAVIGATION
-                  // =========================
-
+                  // ================= DATE NAV =================
                   Row(
-                    mainAxisAlignment:
-                    MainAxisAlignment
-                        .spaceBetween,
-
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-
                       IconButton(
                         onPressed: () {
                           setState(() {
                             selectedDate =
-                                selectedDate.subtract(
-                                  const Duration(
-                                    days: 1,
-                                  ),
-                                );
+                                selectedDate.subtract(const Duration(days: 1));
                           });
                         },
-
-                        icon: const Icon(
-                          Icons.arrow_back_ios,
-                          color:
-                          AppColors.red500,
-                          size: 18,
-                        ),
+                        icon: const Icon(Icons.arrow_back_ios,
+                            color: AppColors.red500, size: 18),
                       ),
-
                       Column(
                         children: [
-
                           Text(
                             "${selectedDate.day}/${selectedDate.month}/${selectedDate.year}",
-
                           ),
-
                           Text(
-                            getDayName(
-                              selectedDate,
-                            ),
-
-                            style: TextStyle(
-
-                              fontSize: 12,
-                            ),
+                            getDayName(selectedDate),
+                            style: const TextStyle(fontSize: 12),
                           ),
                         ],
                       ),
-
                       IconButton(
                         onPressed: () {
                           setState(() {
                             selectedDate =
-                                selectedDate.add(
-                                  const Duration(
-                                    days: 1,
-                                  ),
-                                );
+                                selectedDate.add(const Duration(days: 1));
                           });
                         },
-
-                        icon: const Icon(
-                          Icons.arrow_forward_ios,
-                          color:
-                          AppColors.red500,
-                          size: 18,
-                        ),
+                        icon: const Icon(Icons.arrow_forward_ios,
+                            color: AppColors.red500, size: 18),
                       ),
                     ],
                   ),
 
                   const SizedBox(height: 10),
 
-                  // =========================
-                  // HEADER
-                  // =========================
-
+                  // ================= HEADER =================
                   Row(
-                    mainAxisAlignment:
-                    MainAxisAlignment
-                        .spaceBetween,
-
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-
                       const Text(
                         "Reminders",
-
                         style: TextStyle(
                           fontSize: 18,
-                          fontWeight:
-                          FontWeight.bold,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-
                       Container(
                         decoration: BoxDecoration(
-                          color:
-                          AppColors.red500,
-
-                          borderRadius:
-                          BorderRadius.circular(
-                            10,
-                          ),
+                          color: AppColors.red500,
+                          borderRadius: BorderRadius.circular(10),
                         ),
-
                         child: IconButton(
                           onPressed: () {
-                            context.push(
-                              '/create_reminder',
-                            );
+                            context.push('/create_reminder');
                           },
-
-                          icon: const Icon(
-                            Icons.add,
-                          ),
+                          icon: const Icon(Icons.add),
                         ),
                       ),
                     ],
@@ -400,106 +246,56 @@ class _ReminderScreenState extends State<ReminderScreen> {
 
                   const SizedBox(height: 10),
 
-                  // =========================
-                  // REMINDERS LIST
-                  // =========================
-
+                  // ================= LIST =================
                   Expanded(
                     child: allReminders.isEmpty
-                        ? Center(
-                      child: Text(
-                        "No reminders yet",
-
-                      ),
-                    )
+                        ? const Center(child: Text("No reminders yet"))
                         : ListView.builder(
-                      itemCount:
-                      allReminders.length,
-
-                      itemBuilder:
-                          (context, index) {
-                        final item =
-                        allReminders[index];
+                      itemCount: allReminders.length,
+                      itemBuilder: (context, index) {
+                        final item = allReminders[index];
 
                         return Container(
-                          margin:
-                          const EdgeInsets.only(
-                            bottom: 12,
-                          ),
-
-                          padding:
-                          const EdgeInsets.all(
-                            16,
-                          ),
-
-                          decoration:
-                          BoxDecoration(
+                          margin: const EdgeInsets.only(bottom: 12),
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
                             color: theme.cardColor,
-
-                            borderRadius:
-                            BorderRadius
-                                .circular(
-                              16,
-                            ),
-
-                            border:
-                            customBorder(),
+                            borderRadius: BorderRadius.circular(16),
+                            border: customBorder(),
                           ),
-
                           child: Row(
                             mainAxisAlignment:
-                            MainAxisAlignment
-                                .spaceBetween,
-
+                            MainAxisAlignment.spaceBetween,
                             children: [
-
                               Column(
                                 crossAxisAlignment:
-                                CrossAxisAlignment
-                                    .start,
-
+                                CrossAxisAlignment.start,
                                 children: [
-
                                   Text(
                                     item.title,
-
-                                    style:
-                                    const TextStyle(
-
-                                      fontWeight:
-                                      FontWeight
-                                          .bold,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
-
-                                  const SizedBox(
-                                    height: 6,
-                                  ),
-
+                                  const SizedBox(height: 6),
                                   Text(
                                     "${item.dateTime.day}/${item.dateTime.month}/${item.dateTime.year} • ${formatTime(item.dateTime)}",
-
-                                    style:
-                                    TextStyle(
-                                      fontSize:
-                                      12,
-                                    ),
+                                    style: const TextStyle(fontSize: 12),
                                   ),
                                 ],
                               ),
 
+                              // ✅ FIXED DELETE LOGIC
                               IconButton(
                                 icon: const Icon(
                                   Icons.delete,
                                   color: Colors.red,
                                 ),
-
-                                onPressed:
-                                    () async {
-                                  await controller
-                                      .deleteReminder(
-                                    item.id,
-                                  );
+                                onPressed: () async {
+                                  await box.delete(item.id);
+                                  await NotificationService.instance
+                                      .cancel(item.id);
+                                  setState(() {});
                                 },
                               ),
                             ],

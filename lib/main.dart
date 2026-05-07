@@ -9,16 +9,18 @@ import 'app.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Hive
   await Hive.initFlutter();
   Hive.registerAdapter(ReminderAdapter());
   await Hive.openBox<Reminder>('reminders');
 
-  // Timezone
+  // ✅ TIMEZONE (CORRECT SIMPLE SETUP)
   tz.initializeTimeZones();
 
-  // Notifications
+  // IMPORTANT: DO NOT setLocalLocation manually
+  // tz.local is handled automatically
+
   await NotificationService.instance.init();
+  await NotificationService.instance.requestPermissions();
 
   runApp(const BuildersOasisApp());
 }

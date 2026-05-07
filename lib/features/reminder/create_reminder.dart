@@ -319,6 +319,23 @@ class _CreateReminderScreenState
                   ),
                 ),
               ),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () async {
+                    final testTime =
+                    DateTime.now().add(const Duration(seconds: 10));
+
+                    await NotificationService.instance.scheduleNotification(
+                      id: 1001,
+                      title: "Scheduled Test",
+                      body: "This should appear after 10 seconds",
+                      scheduledDate: testTime,
+                    );
+                  },
+                  child: const Text("Test Schedule"),
+                )
+              ),
             ],
           ),
         ),
