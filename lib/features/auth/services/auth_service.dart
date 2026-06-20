@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 class AuthService {
 
   static const String baseUrl =
-      'http://192.168.0.82:3000/api/auth';
+      'http://192.168.0.191:3000/api';
 
   /// REGISTER
   static Future<Map<String, dynamic>> register({
@@ -17,7 +17,7 @@ class AuthService {
     try {
 
       final response = await http.post(
-        Uri.parse('$baseUrl/register'),
+        Uri.parse('$baseUrl/auth/register'),
         headers: {
           'Content-Type': 'application/json',
         },
@@ -66,7 +66,7 @@ class AuthService {
     try {
 
       final response = await http.post(
-        Uri.parse('$baseUrl/login'),
+        Uri.parse('$baseUrl/auth/login'),
         headers: {
           'Content-Type': 'application/json',
         },

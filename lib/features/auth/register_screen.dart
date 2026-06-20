@@ -5,7 +5,9 @@ import '/core/theme/app_colors.dart';
 import '/features/auth/services/auth_service.dart';
 import '/features/auth/services/storage_service.dart';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
-
+import 'package:provider/provider.dart';
+import '/features/auth/providers/auth_provider.dart';
+import '/features/user/model/user_model.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -36,7 +38,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     super.dispose();
   }
 
-  // ✅ REGISTER FUNCTION (ONLY ONE VERSION)
+  //  REGISTER FUNCTION (ONLY ONE VERSION)
   Future<void> _register() async {
 
     final firstName = _firstNameController.text.trim();
@@ -81,6 +83,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
         await StorageService.saveToken(data['token']);
         await StorageService.saveUser(data['user']);
 
+// 🔥 UPDATE GLOBAL STATE (IMPORTANT)
+        if (!mounted) return;
+
+        context.read<UserProvider>().setUser(
+          UserModel.fromJson(data['user']),
+        );
         if (!mounted) return;
 
         _showSuccess("Account created successfully");
@@ -100,7 +108,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
   }
 
-  /// ❌ ERROR SNACKBAR
+  ///  ERROR SNACKBAR
   void _showError(String message) {
     final snackBar = SnackBar(
       elevation: 0,
@@ -118,7 +126,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       ..showSnackBar(snackBar);
   }
 
-  /// ✅ SUCCESS SNACKBAR
+  ///  SUCCESS SNACKBAR
   void _showSuccess(String message) {
     final snackBar = SnackBar(
       elevation: 0,

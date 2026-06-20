@@ -6,6 +6,9 @@ import '/core/theme/app_colors.dart';
 import '/features/auth/services/auth_service.dart';
 import '/features/auth/services/storage_service.dart';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
+import 'package:provider/provider.dart';
+import '/features/auth/providers/auth_provider.dart';
+import '/features/user/model/user_model.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -47,24 +50,26 @@ class _LoginScreenState extends State<LoginScreen> {
       );
 
       if (response['success']) {
-
         final data = response['data'];
 
         await StorageService.saveToken(data['token']);
-        await StorageService.saveUser(data['user']);
 
         if (!mounted) return;
+
+        await context.read<UserProvider>().fetchCurrentUser();
 
         _showSuccess("Login successful");
 
         context.go('/');
-
       } else {
         _showError(response['message']);
       }
 
     } catch (e) {
-      _showError("Login failed. Try again.");
+
+      print(e);
+
+      _showError(e.toString());
     } finally {
       if (mounted) {
         setState(() => _loading = false);

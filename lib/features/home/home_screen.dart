@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 import 'package:builders_oasis/widgets/cards/course_card.dart';
 import 'package:builders_oasis/widgets/cards/CourseCompactCard.dart';
 import 'dart:ui';
+import 'package:provider/provider.dart';
+import '/features/auth/providers/auth_provider.dart';
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -228,8 +230,9 @@ final List<Map<String, dynamic>> courses = [
 class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-   final  textTheme = theme.textTheme;
+    final userProvider =
+    context.watch<UserProvider>();
+    final user = userProvider.user;
     return  GradientScaffold(
       child: Scaffold(
         backgroundColor: Colors.transparent,
@@ -249,14 +252,18 @@ class _HomeScreenState extends State<HomeScreen> {
                         InkWell(
                           onTap: () => context.push("/profile"),
                           borderRadius: BorderRadius.circular(30),
-                          child: const CircleAvatar(
+                          child: CircleAvatar(
                             radius: 30,
-                            backgroundImage: AssetImage("assets/icons/H_badger_icon.png"),
-                          ),
+                            backgroundImage:
+                            user?.profileImage != null
+                                ? NetworkImage(user!.profileImage!)
+                                : const AssetImage(
+                              "assets/icons/H_badger_icon.png",
+                            ) as ImageProvider,                          ),
                         ),
                         const SizedBox(width: 8),
-                        const Text(
-                          "John",
+                         Text(
+                            user?.firstName ?? 'Guest',
                           style: TextStyle(fontSize: 14),
                         ),
                       ],

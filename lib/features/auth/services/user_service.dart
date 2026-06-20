@@ -6,8 +6,7 @@ import 'storage_service.dart';
 class UserService {
 
   static const String baseUrl =
-      'http://192.168.0.82:3000/api';
-
+      'http://192.168.0.191:3000/api';
   // =========================
   // GET CURRENT USER
   // =========================
@@ -20,6 +19,7 @@ class UserService {
 
       // NO TOKEN FOUND
       if (token == null) {
+
 
         return {
           "success": false,
